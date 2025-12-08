@@ -1,0 +1,11 @@
+{
+    "name": "egavi/bintang-kejora",
+    "autoload": {
+        "psr-4": {
+            "Egavi\\BintangKejora\\": "src/"
+        }
+    },
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.1"
+    }
+}

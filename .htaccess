@@ -1,0 +1,17 @@
+# Aktifkan Rewrite Engine
+RewriteEngine On
+
+# Sesuaikan base path project kamu
+RewriteBase /BintangKejora/
+
+# Abaikan file dan folder yang benar-benar ada
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Arahkan semua request ke index.php dengan parameter ?route= (avoid conflict with pagination ?page=)
+RewriteRule ^(.+)$ index.php?route=$1 [L,QSA]
+
+# Lindungi file konfigurasi
+<Files "config.php">
+    Require all denied
+</Files>

@@ -1,0 +1,1 @@
+Place fpdf.php here. Download FPDF from http://www.fpdf.org/ and put fpdf.php in this folder.
