@@ -60,8 +60,9 @@ $items = pdo()->query("SELECT * FROM items ORDER BY name")->fetchAll();
           <thead class="table-light">
             <tr>
               <th>Item</th>
-              <th>Qty</th>
-              <th>Harga</th>
+              <th>Qty (PCS)</th>
+              <th>Qty (Satuan)</th>
+              <th>Harga / PCS</th>
               <th>Subtotal</th>
               <th></th>
             </tr>
@@ -69,7 +70,7 @@ $items = pdo()->query("SELECT * FROM items ORDER BY name")->fetchAll();
           <tbody></tbody>
           <tfoot>
             <tr class="fw-bold">
-              <td colspan="3" class="text-end" style="border-top:2px solid #0000001e;">
+              <td colspan="4" class="text-end" style="border-top:2px solid #0000001e;">
                 Total
               </td>
               <td style="border-top:2px solid #0000001e;">
@@ -118,9 +119,12 @@ $items = pdo()->query("SELECT * FROM items ORDER BY name")->fetchAll();
             <?php foreach ($items as $it): ?>
               <option value="<?= $it['id'] ?>"
                       data-price="<?= $it['price'] ?>"
-                      data-name="<?= htmlspecialchars($it['name']) ?>">
-                <?= htmlspecialchars($it['name']) ?> -
-                <?= number_format($it['price'], 0, ',', '.') ?>
+                      data-name="<?= htmlspecialchars($it['name']) ?>"
+                      data-unit="<?= htmlspecialchars($it['unit_name'] ?? 'pcs') ?>"
+                      data-multiplier="<?= $it['unit_multiplier'] ?? 1 ?>">
+                <?= htmlspecialchars($it['name']) ?>
+                (<?= $it['unit_name'] ?? 'pcs' ?> x<?= $it['unit_multiplier'] ?? 1 ?>)
+                - <?= number_format($it['price'], 0, ',', '.') ?>
               </option>
             <?php endforeach; ?>
           </select>
@@ -206,93 +210,129 @@ document.addEventListener('DOMContentLoaded', function () {
 function recalcTotal() {
   let total = 0;
   document.querySelectorAll('#transactionItemsTable tbody tr')
-    .forEach(r => total += parseInt(r.dataset.subtotal || 0));
-  document.getElementById('totalText').innerText =
-    new Intl.NumberFormat('id-ID').format(total);
+    .forEach(tr => total += parseInt(tr.dataset.subtotal || 0));
+  document.getElementById('totalText').innerText = formatIDR(total);
 }
 
-document.getElementById('addItemBtn').addEventListener('click', function () {
-  const itemSelect = document.getElementById('itemSelect');
-  const qtyInput = document.getElementById('qty');
-  const priceInput = document.getElementById('priceInput');
-  const itemName = document.getElementById('itemName');
+function formatIDR(n){
+  return new Intl.NumberFormat('id-ID').format(n);
+}
 
-  if (!itemSelect.value) {
-    alert('Pilih item');
-    return;
-  }
+
+document.getElementById('addItemBtn').addEventListener('click', function () {
+  const sel = document.getElementById('itemSelect');
+  const opt = sel.selectedOptions[0];
+  if (!opt) { alert('Pilih item'); return; }
 
   const tbody = document.querySelector('#transactionItemsTable tbody');
   const idx = tbody.children.length;
 
-  const tr = document.createElement('tr');
+  const pricePCS = parseInt(opt.dataset.price);
+  const modalQtyPCS = parseInt(document.getElementById('qty').value) || 0;
+  const multiplier = parseFloat(opt.dataset.multiplier) || 1;
+  const qtyUnitInit = multiplier
+  ? (modalQtyPCS / multiplier).toFixed(2)
+  : 0;
+  const unitName = opt.dataset.unit;
 
-  tr.innerHTML = `
-    <td>
-      ${itemName.value}
-      <input type="hidden" name="items[${idx}][item_id]" value="${itemSelect.value}">
-      <input type="hidden" name="items[${idx}][item_name]" value="${itemName.value}">
-    </td>
-    <td>
-      <input type="number" name="items[${idx}][qty]" value="${qtyInput.value}"
-             min="1" class="form-control form-control-sm qtyInput">
-    </td>
-    <td>
-      <input type="number" name="items[${idx}][price]" value="${priceInput.value}"
-             class="form-control form-control-sm priceInput">
-    </td>
-    <td class="subtotalCell">0</td>
-    <td class="text-center">
-      <button type="button" class="btn btn-sm btn-outline-danger removeBtn">
-        <i class="fas fa-trash"></i>
-      </button>
-    </td>
-  `;
+  const tr = document.createElement('tr');
+  tr.dataset.multiplier = multiplier;
+  tr.dataset.price = pricePCS;
+  tr.dataset.subtotal = 0;
+
+tr.innerHTML = `
+  <td>
+    <input type="text"
+           class="form-control form-control-sm item-name-input"
+           name="items[${idx}][item_name]"
+           value="${opt.dataset.name}">
+    <input type="hidden" name="items[${idx}][item_id]" value="${opt.value}">
+    <input type="hidden" name="items[${idx}][qty]" class="qty-hidden" value="${modalQtyPCS}">
+    <input type="hidden" name="items[${idx}][price]" value="${pricePCS}">
+  </td>
+
+  <td>
+    <div class="d-flex align-items-center gap-2">
+    <input type="number" min="0"
+           class="form-control form-control-sm qty-pcs"
+           value="${modalQtyPCS}">
+    <small class="text-muted fst-italic text-nowrap">
+      pcs
+    </small>
+    </div>
+  </td>
+
+<td>
+  <div class="d-flex align-items-center gap-2">
+    <input type="number" min="0" step="0.01"
+           class="form-control form-control-sm qty-unit"
+           value="${qtyUnitInit}"
+           style="width:90px">
+
+    <small class="text-muted fst-italic text-nowrap">
+      ${unitName} (x${multiplier})
+    </small>
+  </div>
+</td>
+
+
+  <td>Rp ${formatIDR(pricePCS)}</td>
+
+  <td class="subtotalCell">0</td>
+
+  <td class="text-center">
+    <button type="button" class="btn btn-sm btn-outline-danger removeBtn">
+      <i class="fas fa-trash"></i>
+    </button>
+  </td>
+`;
+
+
 
   tbody.appendChild(tr);
+  // initial subtotal
+const initialSubtotal = modalQtyPCS * pricePCS;
+tr.dataset.subtotal = initialSubtotal;
+tr.querySelector('.subtotalCell').innerText = formatIDR(initialSubtotal);
+recalcTotal();
 
-  // --- fungsi hitung ulang subtotal baris ---
-  function updateRowSubtotal() {
-    const q = parseInt(tr.querySelector('.qtyInput').value) || 0;
-    const p = parseInt(tr.querySelector('.priceInput').value) || 0;
-    const s = q * p;
 
-    tr.dataset.subtotal = s;
-    tr.querySelector('.subtotalCell').innerText =
-      new Intl.NumberFormat('id-ID').format(s);
+  const qtyPCS = tr.querySelector('.qty-pcs');
+  const qtyUnit = tr.querySelector('.qty-unit');
+  const qtyHidden = tr.querySelector('.qty-hidden');
 
+  function recalcFromPCS(){
+    const pcs = parseInt(qtyPCS.value) || 0;
+    qtyUnit.value = (pcs / multiplier).toFixed(2);
+    const subtotal = pcs * pricePCS;
+    qtyHidden.value = pcs;
+    tr.dataset.subtotal = subtotal;
+    tr.querySelector('.subtotalCell').innerText = formatIDR(subtotal);
     recalcTotal();
   }
 
-  // initial calculate
-  updateRowSubtotal();
+  function recalcFromUnit(){
+    const unit = parseFloat(qtyUnit.value) || 0;
+    const pcs = Math.round(unit * multiplier);
+    qtyPCS.value = pcs;
+    const subtotal = pcs * pricePCS;
+    qtyHidden.value = pcs;
+    tr.dataset.subtotal = subtotal;
+    tr.querySelector('.subtotalCell').innerText = formatIDR(subtotal);
+    recalcTotal();
+  }
 
-  // listen perubahan qty & price
-  tr.querySelector('.qtyInput').addEventListener('input', updateRowSubtotal);
-  tr.querySelector('.priceInput').addEventListener('input', updateRowSubtotal);
+  qtyPCS.addEventListener('input', recalcFromPCS);
+  qtyUnit.addEventListener('input', recalcFromUnit);
 
-  // remove row
-  tr.querySelector('.removeBtn').addEventListener('click', function () {
+  tr.querySelector('.removeBtn').addEventListener('click', () => {
     tr.remove();
     recalcTotal();
-    
   });
 
-  // reset modal & close
-  qtyInput.value = 1;
-  priceInput.value = '';
-const modalEl = document.getElementById('addItemModal');
-const modalInstance = bootstrap.Modal.getInstance(modalEl);
-
-// tutup modal dulu
-modalInstance.hide();
-
-// reset SETELAH modal benar-benar tertutup
-modalEl.addEventListener('hidden.bs.modal', function handler() {
-  resetAddItemModal();
-  modalEl.removeEventListener('hidden.bs.modal', handler);
-});
-
+  // reset modal
+  if (sel.tomselect) sel.tomselect.clear();
+  bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
 });
 
 document.getElementById('addItemModal')
