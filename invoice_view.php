@@ -25,15 +25,16 @@ $items = $items->fetchAll();
         <tr>
           <td><?=htmlspecialchars($it['item_name'])?></td>
           <td><?=$it['qty']?></td>
-          <td><?=number_format($it['price'],0,',','.')?></td>
-          <td><?=number_format($it['qty'] * $it['price'],0,',','.')?></td>
+          <td>Rp. <?=number_format($it['price'],0,',','.')?></td>
+          <td>Rp. <?=number_format($it['qty'] * $it['price'],0,',','.')?></td>
         </tr>
         <?php endforeach; ?>
+        <tr class="fw-bold">
+          <td class="text-end" colspan="3" style="border-top:2px solid #0000001e;">Total</td>
+          <td style="border-top:2px solid #0000001e;">Rp. <?=number_format($inv['total'],0,',','.')?></td>
+        </tr>
       </tbody>
     </table>
-    <div class="text-end">
-      <h5>Total: <?=number_format($inv['total'],0,',','.')?></h5>
-    </div>
     <div class="mt-3">
       <a href="invoice_pdf?id=<?=$inv['id']?>" class="btn btn-primary">Download PDF</a>
       <a href="invoices_new" class="btn btn-secondary">Buat Invoice Baru</a>

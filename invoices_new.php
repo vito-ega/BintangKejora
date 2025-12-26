@@ -39,7 +39,7 @@ $items = pdo()->query("SELECT * FROM items ORDER BY name")->fetchAll();
 
 
 <div class="table-responsive">
-  <table class="table table-bordered align-middle" id="invoiceItemsTable">
+  <table class="table align-middle" id="invoiceItemsTable">
     <colgroup>
       <col style="width:55%">
       <col style="width:10%">
@@ -56,7 +56,21 @@ $items = pdo()->query("SELECT * FROM items ORDER BY name")->fetchAll();
         <th></th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- rows akan ditambahkan di sini -->
+    </tbody>
+    <tfoot>
+      <tr class="fw-bold">
+        <td colspan="3" class="text-end" style="border-top:2px solid #0000001e;">
+          Total
+        </td>
+        <td style="border-top:2px solid #0000001e;">
+          Rp.<span id="totalText">0</span>
+        </td>
+        <td style="border-top:2px solid #0000001e;"></td>
+      </tr>
+    </tfoot>
+
   </table>
 </div>
 
