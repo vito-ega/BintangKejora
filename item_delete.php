@@ -6,7 +6,7 @@ require_login();
 $id = $_GET['id'] ?? 0;
 
 // Pastikan item belum dipakai di invoice manapun
-$stmtCheck = pdo()->prepare("SELECT COUNT(*) FROM invoice_items WHERE item_id = ?");
+$stmtCheck = pdo()->prepare("SELECT COUNT(*) FROM transaction_items WHERE item_id = ?");
 $stmtCheck->execute([$id]);
 $count = $stmtCheck->fetchColumn();
 if ($count > 0) {

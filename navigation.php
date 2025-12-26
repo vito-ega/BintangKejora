@@ -17,7 +17,7 @@ function nav_active($path, $currentPath) {
 ?>
 <div class="border-end bg-white sidebar-inner" style="min-width:250px">
   <div class="sidebar-heading p-3 d-flex align-items-center justify-content-between">
-    <strong>Bintang Kejora 88</strong>
+    <strong>Bintang Jaya</strong>
     <button id="menu-toggle-sidebar" class="btn btn-outline-secondary toggle-btn" style="margin-left:6px">
       <i class="fa-solid fa-chevron-left"></i>
     </button>
@@ -31,8 +31,8 @@ function nav_active($path, $currentPath) {
       <i class="fa-solid fa-dashboard"></i><span class="nav-text">Dashboard</span>
     </a>
 
-    <a href="invoices" class="list-group-item list-group-item-action <?= nav_active('invoices', $currentPath) ? 'active' : '' ?>">
-      <i class="fa-solid fa-file-invoice"></i><span class="nav-text">Invoice</span>
+    <a href="transactions" class="list-group-item list-group-item-action <?= nav_active('transactions', $currentPath) ? 'active' : '' ?>">
+      <i class="fa-solid fa-file-invoice"></i><span class="nav-text">Transaction</span>
     </a>
 
       <a href="customers" class="list-group-item list-group-item-action <?= nav_active('customers', $currentPath) ? 'active' : '' ?>">

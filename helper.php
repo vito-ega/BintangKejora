@@ -67,6 +67,27 @@ function gen_invoice_no() {
     return "INV-{$date}-{$rand}";
 }
 
+function gen_transaction_no($customer_id, PDO $pdo) {
+    // hitung transaksi customer ini
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM transactions 
+        WHERE customer_id = ?
+    ");
+    $stmt->execute([$customer_id]);
+    $count = (int)$stmt->fetchColumn();
+
+    // urutan berikutnya
+    $sequence = $count + 1;
+
+    // padding
+    $custPart = str_pad($customer_id, 3, '0', STR_PAD_LEFT);
+    $seqPart  = str_pad($sequence, 3, '0', STR_PAD_LEFT);
+
+    return "TRX-{$custPart}-{$seqPart}";
+}
+
+
 function is_logged_in() {
     return !empty($_SESSION['user_id']);
 }

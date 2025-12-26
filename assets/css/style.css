@@ -128,6 +128,7 @@ body {
 #sidebar-wrapper .nav-text {
   display: inline-block;
   transition: opacity 0.3s ease, transform 0.3s ease;
+  color: #330;
 }
 
 /* Hide text saat kecil */
@@ -272,8 +273,8 @@ body.preload * {
 
 /* --- Table Header Styles (Monokrom) --- */
 .table thead th {
-    background-color: #d8d8d8; /* Hitam gelap */
-    color: #000000; /* Teks putih */
+    background-color: #e3e3e3; /* Hitam gelap */
+    color: #393939; /* Teks putih */
     padding: 15px 20px;
     text-align: left;
     font-weight: 600;
@@ -394,3 +395,4 @@ body.preload * {
   font-size: 14px !important;
   margin:auto;
 }
+

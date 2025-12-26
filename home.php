@@ -9,7 +9,7 @@ $today = date('Y-m-d');
 // Ambil data invoice hari ini
 $stmt = pdo()->prepare("
     SELECT COUNT(*) AS total_invoice, COALESCE(SUM(total), 0) AS total_nilai
-    FROM invoices
+    FROM transactions
     WHERE DATE(created_at) = ?
 ");
 $stmt->execute([$today]);
@@ -33,7 +33,7 @@ $user = current_user();
     <div class="col-md-6 col-lg-3">
       <div class="card shadow-sm border-0">
         <div class="card-body">
-          <h6 class="text-muted mb-2">Today Invoice</h6>
+          <h6 class="text-muted mb-2">Today's Transactions</h6>
           <h3 class="fw-bold mb-0"><?= $summary['total_invoice'] ?></h3>
         </div>
       </div>
@@ -42,7 +42,7 @@ $user = current_user();
     <div class="col-md-6 col-lg-4">
       <div class="card shadow-sm border-0">
         <div class="card-body">
-          <h6 class="text-muted mb-2">Today Income</h6>
+          <h6 class="text-muted mb-2">Today's Income</h6>
           <h3 class="fw-bold text-success mb-0"><?= rupiah($summary['total_nilai']) ?></h3>
         </div>
       </div>

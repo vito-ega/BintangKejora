@@ -11,7 +11,7 @@ $stmt = pdo()->prepare("
     SELECT 
         COALESCE(SUM(total),0) AS total_value,
         COUNT(*) AS invoice_count
-    FROM invoices
+    FROM transactions
     WHERE created_at BETWEEN ? AND ?
 ");
 $stmt->execute([$start, $end]);
@@ -22,7 +22,7 @@ $stmt2 = pdo()->prepare("
     SELECT 
         c.name AS customer_name,
         SUM(i.total) AS total_belanja
-    FROM invoices i
+    FROM transactions i
     JOIN customers c ON c.id = i.customer_id
     WHERE i.created_at BETWEEN ? AND ?
     GROUP BY c.id, c.name
@@ -37,9 +37,9 @@ $stmt3 = pdo()->prepare("
     SELECT 
         it.name AS item_name,
         SUM(ii.qty) AS total_qty
-    FROM invoice_items ii
+    FROM transaction_items ii
     JOIN items it ON it.id = ii.item_id
-    JOIN invoices i ON i.id = ii.invoice_id
+    JOIN transactions i ON i.id = ii.transaction_id
     WHERE i.created_at BETWEEN ? AND ?
     GROUP BY it.id, it.name
     ORDER BY total_qty DESC
@@ -76,7 +76,7 @@ $top_products = $stmt3->fetchAll();
     <div class="col-md-4 mb-3">
       <div class="card shadow-sm" style="border: none; border-left: 5px solid #A7C7E7; border-radius: .5rem;"> 
         <div class="card-body">
-          <h6>Total Nilai Invoice</h6>
+          <h6>Total Nilai Transaksi</h6>
           <h3 class="fw-bold" style="color: #6B8EBF;">Rp. <?=number_format($summary['total_value'],0,',','.')?></h3> 
         </div>
       </div>
@@ -84,7 +84,7 @@ $top_products = $stmt3->fetchAll();
     <div class="col-md-4 mb-3">
       <div class="card shadow-sm" style="border: none; border-left: 5px solid #B0E0E6; border-radius: .5rem;"> 
         <div class="card-body">
-          <h6>Jumlah Invoice</h6>
+          <h6>Jumlah Transaksi</h6>
           <h3 class="fw-bold" style="color: #77BBDD;"><?=$summary['invoice_count']?></h3> 
         </div>
       </div>

@@ -6,7 +6,7 @@ require_login();
 $id = $_GET['id'] ?? 0;
 
 //Pastikan customer belum dipakai di invoice manapun
-$stmtCheck = pdo()->prepare("SELECT COUNT(*) FROM invoices WHERE customer_id = ?");
+$stmtCheck = pdo()->prepare("SELECT COUNT(*) FROM transactions WHERE customer_id = ?");
 $stmtCheck->execute([$id]);
 $count = $stmtCheck->fetchColumn();
 if ($count > 0) {

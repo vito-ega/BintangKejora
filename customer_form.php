@@ -29,11 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = pdo()->lastInsertId();
         }
 
-        if (isset($_GET['from_modal'])) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'id' => $id, 'name' => $name]);
-            exit;
-        }
+      if (isset($_GET['from_modal'])) {
+          header('Content-Type: application/json');
+          echo json_encode([
+              'success' => true,
+              'id'      => $id,
+              'name'    => $name,
+              'phone'   => $phone
+          ]);
+          exit;
+      }
+
 
         header('Location: customers');
         exit;
